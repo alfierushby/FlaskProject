@@ -1,6 +1,5 @@
 import os
 
-
 class Config(object):
     TESTING = False
     SQLALCHEMY_TRACK_MODIFICATIONS = False
