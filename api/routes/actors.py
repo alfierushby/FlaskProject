@@ -1,10 +1,11 @@
 from flask import Blueprint, jsonify, request
 from marshmallow import ValidationError
-from sqlalchemy.exc import DBAPIError
+from sqlalchemy.exc import DBAPIError, IntegrityError
 
 from api.models import db
 from api.models.actor import Actor
 from api.models.film import Film
+from api.routes.films import try_commit
 from api.schemas.actor import actor_schema, actors_schema
 from api.schemas.film import film_schema, films_schema
 
@@ -45,7 +46,7 @@ def create_actor():
 
     actor = Actor(**actor_data)
     db.session.add(actor)
-    db.session.commit()
+    try_commit("Error with committing actor to database")
 
     return actor_schema.dump(actor)
 
@@ -57,13 +58,8 @@ def delete_actor(actor_id):
     :return: The actor object that has been deleted, or an error message
     """
     actor = Actor.query.get_or_404(actor_id)
-
-    try:
-        db.session.delete(actor)
-    except ValidationError as err:
-        return jsonify(err.messages), 400
-
-    db.session.commit()
+    db.session.delete(actor)
+    try_commit("Cannot delete actor from database")
 
     return actor_schema.dump(actor)
 
@@ -81,7 +77,8 @@ def update_actor(actor_id):
     actor.first_name = first_name
     actor.last_name = last_name
 
-    db.session.commit()
+    try_commit("Error with committing actor to database")
+
     return actor_schema.dump(actor)
 
 
@@ -107,10 +104,11 @@ def add_film(actor_id, film_id):
     actor = Actor.query.get_or_404(actor_id)
     film = Film.query.get_or_404(film_id)
     actor.films.append(film)
+    # Specific error to be more useful
     try:
         db.session.commit()
-    except DBAPIError:
-        return jsonify("You tried to add an film that already exists."), 400
+    except IntegrityError:
+        return jsonify("You tried to add a film that already exists."), 400
     return film_schema.dump(film)
 
 
@@ -123,6 +121,9 @@ def delete_film(actor_id, film_id):
     """
     actor = Actor.query.get_or_404(actor_id)
     film = Film.query.get_or_404(film_id)
-    actor.films.remove(film)
+    try:
+        film.actors.remove(actor)
+    except ValueError:
+        return jsonify("Cannot remove the actor as it doesn't exist"), 400
     db.session.commit()
     return film_schema.dump(film)

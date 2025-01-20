@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, request
 from marshmallow import ValidationError
-from sqlalchemy.exc import DBAPIError
+from sqlalchemy.exc import DBAPIError, IntegrityError
 
 from api.models import db
 from api.models.actor import Actor
@@ -11,6 +11,12 @@ from api.schemas.actor import actor_schema, actors_schema
 # Create a "Blueprint" or module
 # We can insert this into our flask app
 films_router = Blueprint('films', __name__, url_prefix='/films')
+
+def try_commit(msg):
+    try:
+        db.session.commit()
+    except DBAPIError:
+        return jsonify(msg), 400
 
 
 @films_router.get('/')
@@ -58,13 +64,8 @@ def delete_film(film_id):
     :return: The film object that has been deleted, or an error message
     """
     film = Film.query.get_or_404(film_id)
-
-    try:
-        db.session.delete(film)
-    except ValidationError as err:
-        return jsonify(err.messages), 400
-
-    db.session.commit()
+    db.session.delete(film)
+    try_commit("Cannot delete actor from database")
 
     return film_schema.dump(film)
 
@@ -87,7 +88,8 @@ def update_actor(film_id):
     film.release_year = release_year
     film.length = length
 
-    db.session.commit()
+    try_commit("Error with committing actor to database")
+
     return film_schema.dump(film)
 
 
@@ -115,8 +117,8 @@ def add_actor(film_id, actor_id):
     film.actors.append(actor)
     try:
         db.session.commit()
-    except DBAPIError:
-        return jsonify("You tried to add an actor that already exists."), 400
+    except IntegrityError:
+        return jsonify("You tried to add a film that already exists."), 400
     return actor_schema.dump(actor)
 
 
@@ -125,10 +127,14 @@ def delete_actor(film_id, actor_id):
     """
     :param film_id: The id of the film in the database
     :param actor_id: The id of the actor to be removed from the film
-    :return: The actor removed from the film, or a error message
+    :return: The actor removed from the film, or an error message
     """
     film = Film.query.get_or_404(film_id)
     actor = Actor.query.get_or_404(actor_id)
-    film.actors.remove(actor)
-    db.session.commit()
+    try:
+        film.actors.remove(actor)
+    except ValueError:
+        return jsonify("Cannot remove the actor as it doesn't exist"), 400
+
+    try_commit("Error occurred when trying to commit to database")
     return actor_schema.dump(actor)
