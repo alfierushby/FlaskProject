@@ -14,7 +14,7 @@ actors_router = Blueprint('actors', __name__, url_prefix='/actors')
 @actors_router.get('/')
 def read_all_actors():
     """
-    :return: The actors specified in the request args, or everything if no args are used
+    :return: The actors specified in the request args, or everything if no args are used, all paginated
     """
     first_name = request.args.get('first_name','')
     last_name = request.args.get('last_name', '')
@@ -88,7 +88,7 @@ def update_actor(actor_id):
 def get_films(actor_id):
     """
     :param actor_id: The id of the actor in the database
-    :return: A list of films that the actor stars in, or an error message
+    :return: A list of films that the actor stars in paginated, or an error message
     """
     actor = Actor.query.get_or_404(actor_id)
     title = request.args.get('title','')
