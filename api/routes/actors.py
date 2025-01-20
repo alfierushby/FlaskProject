@@ -19,8 +19,8 @@ def read_all_actors():
     last_name = request.args.get('last_name', '')
 
     actors = Actor.query.filter(or_(
-        Actor.first_name.like(f"%{first_name}%")),
-        Actor.last_name.like(f"%{last_name}")
+        Actor.first_name.contains(f"%{first_name}%")),
+        Actor.last_name.contains(f"%{last_name}")
                               ).all()
 
     return actors_schema.dump(actors)
