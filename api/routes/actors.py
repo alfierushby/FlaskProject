@@ -5,13 +5,29 @@ from sqlalchemy.exc import DBAPIError, IntegrityError
 from api.models import db
 from api.models.actor import Actor
 from api.models.film import Film
-from api.routes.films import try_commit
 from api.schemas.actor import actor_schema, actors_schema
 from api.schemas.film import film_schema, films_schema
 
 # Create a "Blueprint" or module
 actors_router = Blueprint('actors', __name__, url_prefix='/actors')
 
+
+@actors_router.errorhandler(ValidationError)
+def handle_validation_error(error):
+    return jsonify(error.messages), 400
+
+@actors_router.errorhandler(IntegrityError)
+def handle_integrity_error(error):
+    return jsonify("The integrity of the database cannot be met when trying this request. Usually this means you are "
+                   "trying to add a duplicate entry."), 400
+
+@actors_router.errorhandler(500)
+def handle_generic_error():
+    return jsonify("Internal Server Error"), 500
+
+@actors_router.errorhandler(400)
+def custom_error_400(msg):
+    return jsonify(msg), 400
 
 @actors_router.get('/')
 def read_all_actors():
@@ -39,14 +55,11 @@ def create_actor():
     """
     actor_data = request.json
 
-    try:
-        actor_schema.load(actor_data)
-    except ValidationError as err:
-        return jsonify(err.messages), 400
+    actor_schema.load(actor_data)
 
     actor = Actor(**actor_data)
     db.session.add(actor)
-    try_commit("Error with committing actor to database")
+    db.session.commit()
 
     return actor_schema.dump(actor)
 
@@ -59,7 +72,7 @@ def delete_actor(actor_id):
     """
     actor = Actor.query.get_or_404(actor_id)
     db.session.delete(actor)
-    try_commit("Cannot delete actor from database")
+    db.session.commit()
 
     return actor_schema.dump(actor)
 
@@ -77,7 +90,7 @@ def update_actor(actor_id):
     actor.first_name = first_name
     actor.last_name = last_name
 
-    try_commit("Error with committing actor to database")
+    db.session.commit()
 
     return actor_schema.dump(actor)
 
@@ -104,11 +117,7 @@ def add_film(actor_id, film_id):
     actor = Actor.query.get_or_404(actor_id)
     film = Film.query.get_or_404(film_id)
     actor.films.append(film)
-    # Specific error to be more useful
-    try:
-        db.session.commit()
-    except IntegrityError:
-        return jsonify("You tried to add a film that already exists"), 400
+    db.session.commit()
     return film_schema.dump(film)
 
 
