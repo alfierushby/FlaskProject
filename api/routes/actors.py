@@ -1,5 +1,4 @@
-from flask import Blueprint, abort, request
-
+from flask import Blueprint, request
 
 from api.models import db
 from api.models.actor import Actor

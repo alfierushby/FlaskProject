@@ -1,5 +1,5 @@
-from flask import Blueprint, abort, request
-
+from flask import Blueprint, request
+from sqlalchemy import or_
 from api.models import db
 from api.models.actor import Actor
 from api.models.film import Film
@@ -27,6 +27,18 @@ def read_film(film_id):
     """
     film = Film.query.get_or_404(film_id)
     return film_schema.dump(film)
+
+@films_router.post('/search')
+def search_films():
+    title = request.args.get('title','')
+    description = request.args.get('description', '')
+
+    films = Film.query.filter(or_(
+        Film.title.contains(f"%{title}%")),
+        Film.description.contains(f"%{description}")
+                              ).all()
+
+    return films_schema.dump(films)
 
 
 @films_router.post('/')

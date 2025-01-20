@@ -1,12 +1,10 @@
 from flask import Flask, jsonify
-from marshmallow import ValidationError
-from sqlalchemy.exc import IntegrityError
 
 from api.config import config
 from api.routes import routes
 
-app = Flask(__name__)
 
+app = Flask(__name__)
 
 def create_app():
     app = Flask(__name__)

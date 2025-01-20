@@ -1,9 +1,10 @@
-from flask import Blueprint, jsonify
+from flask import Blueprint
+
 from marshmallow import ValidationError
 from sqlalchemy.exc import IntegrityError
-
 from api.routes.actors import actors_router
 from api.routes.films import films_router
+
 
 routes = Blueprint('api',__name__, url_prefix='/api')
 
