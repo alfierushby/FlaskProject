@@ -91,9 +91,16 @@ def get_films(actor_id):
     :return: A list of films that the actor stars in, or an error message
     """
     actor = Actor.query.get_or_404(actor_id)
-    films = actor.films
+    title = request.args.get('title','')
+    description = request.args.get('description', '')
+    page, per_page = paginate_args()
 
-    return films_schema.dump(films)
+    films = actor.films.filter(or_(
+        Film.title.contains(f"%{title}%")),
+        Film.description.contains(f"%{description}")
+                              ).paginate(page=page, per_page=per_page)
+
+    return paginate_data(films_schema, films)
 
 
 @actors_router.patch('/<actor_id>/films/<film_id>')

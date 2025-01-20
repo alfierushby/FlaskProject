@@ -8,4 +8,4 @@ class Film(db.Model):
     release_year = db.Column(db.Integer, nullable=False)
     length = db.Column(db.Integer, nullable=False)
 
-    actors = db.relationship('Actor', secondary='film_actor', back_populates='films')
+    actors = db.relationship('Actor', secondary='film_actor', back_populates='films',lazy='dynamic')
