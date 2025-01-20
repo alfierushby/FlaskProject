@@ -3,31 +3,13 @@ from sqlalchemy import or_
 from api.models import db
 from api.models.actor import Actor
 from api.models.film import Film
+from api.routes.common_functions import paginate_args, paginate_data
 from api.schemas.film import film_schema, films_schema
 from api.schemas.actor import actor_schema, actors_schema
 
 # Create a "Blueprint" or module
 # We can insert this into our flask app
 films_router = Blueprint('films', __name__, url_prefix='/films')
-
-def paginate_args():
-    return request.args.get('page', 1, type=int), request.args.get('per_page', 10, type=int)
-
-def paginate_data(schema,entities):
-    data = {
-        "data": schema.dump(entities),
-        "total": entities.total,
-        "pages": entities.pages,
-        "current_page": entities.page,
-        "per_page": entities.per_page
-    }
-
-    if entities.page < entities.pages:
-        data["next_page"] = f"{request.base_url}?page={entities.page + 1}"
-
-    if entities.page > 1:
-        data["prev_page"] = f"{request.base_url}?page={entities.page - 1}"
-    return data
 
 @films_router.get('/')
 def read_all_films():

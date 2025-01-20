@@ -4,7 +4,7 @@ from sqlalchemy import or_
 from api.models import db
 from api.models.actor import Actor
 from api.models.film import Film
-from api.routes.films import paginate_data, paginate_args
+from api.routes.common_functions import paginate_args, paginate_data
 from api.schemas.actor import actor_schema, actors_schema
 from api.schemas.film import film_schema, films_schema
 
