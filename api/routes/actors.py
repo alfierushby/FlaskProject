@@ -13,15 +13,7 @@ actors_router = Blueprint('actors', __name__, url_prefix='/actors')
 @actors_router.get('/')
 def read_all_actors():
     """
-    :return: All the actors in the database
-    """
-    actors = Actor.query.all()
-    return actors_schema.dump(actors)
-
-@actors_router.post('/search')
-def search_actors():
-    """
-    :return: The actors specified in the request args
+    :return: The actors specified in the request args, or everything if no args are used
     """
     first_name = request.args.get('first_name','')
     last_name = request.args.get('last_name', '')

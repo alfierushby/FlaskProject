@@ -13,25 +13,7 @@ films_router = Blueprint('films', __name__, url_prefix='/films')
 @films_router.get('/')
 def read_all_films():
     """
-    :return: All the films in the database
-    """
-    films = Film.query.all()
-    return films_schema.dump(films)
-
-
-@films_router.get('/<film_id>')
-def read_film(film_id):
-    """
-    :param film_id: id of the film in the database
-    :return: The film specified by the ID, or a 404 if the film doesn't exist
-    """
-    film = Film.query.get_or_404(film_id)
-    return film_schema.dump(film)
-
-@films_router.post('/search')
-def search_films():
-    """
-    :return: The films specified in the request args
+    :return: The films specified in the request args, or everything if no args are used
     """
     title = request.args.get('title','')
     description = request.args.get('description', '')
@@ -43,6 +25,14 @@ def search_films():
 
     return films_schema.dump(films)
 
+@films_router.get('/<film_id>')
+def read_film(film_id):
+    """
+    :param film_id: id of the film in the database
+    :return: The film specified by the ID, or a 404 if the film doesn't exist
+    """
+    film = Film.query.get_or_404(film_id)
+    return film_schema.dump(film)
 
 @films_router.post('/')
 def create_film():
