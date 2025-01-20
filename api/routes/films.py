@@ -118,7 +118,7 @@ def add_actor(film_id, actor_id):
     try:
         db.session.commit()
     except IntegrityError:
-        return jsonify("You tried to add a film that already exists."), 400
+        return jsonify("You tried to add a film that already exists"), 400
     return actor_schema.dump(actor)
 
 
