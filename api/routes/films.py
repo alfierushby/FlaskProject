@@ -79,3 +79,10 @@ def get_actors(film_id):
 
     return actors_schema.dump(actors)
 
+@films_router.post('<film_id>/actors/<actor_id>')
+def add_actor(film_id, actor_id):
+    film = Film.query.get_or_404(film_id)
+    actor = Actor.query.get_or_404(actor_id)
+    film.actors.append(actor)
+    db.session.commit()
+    return actor_schema.dump(actor)
