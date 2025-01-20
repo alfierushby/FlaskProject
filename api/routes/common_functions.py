@@ -1,4 +1,4 @@
-from flask import Blueprint, request
+from flask import request
 
 def paginate_args():
     return request.args.get('page', 1, type=int), request.args.get('per_page', 10, type=int)

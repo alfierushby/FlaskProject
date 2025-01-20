@@ -96,7 +96,7 @@ def get_films(actor_id):
     return films_schema.dump(films)
 
 
-@actors_router.post('/<actor_id>/films/<film_id>')
+@actors_router.patch('/<actor_id>/films/<film_id>')
 def add_film(actor_id, film_id):
     """
     :param actor_id: The id of the actor in the database
