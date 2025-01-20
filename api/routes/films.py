@@ -18,9 +18,7 @@ def read_all_films():
 
 @films_router.get('/<film_id>')
 def read_film(film_id):
-    film = Film.query.get(film_id)
-    if film is None:
-        return jsonify("Cannot find film."), 404
+    film = Film.query.get_or_404(film_id)
     return film_schema.dump(film)
 
 
@@ -42,9 +40,7 @@ def create_film():
 
 @films_router.delete('/<film_id>')
 def delete_film(film_id):
-    film = Film.query.get(film_id)
-    if film is None:
-        return jsonify("Cannot find film to delete."), 404
+    film = Film.query.get_or_404(film_id)
 
     try:
         db.session.delete(film)
@@ -58,9 +54,7 @@ def delete_film(film_id):
 
 @films_router.put('/<film_id>')
 def update_actor(film_id):
-    film = Film.query.get(film_id)
-    if film is None:
-        return jsonify("Cannot find film to edit."), 404
+    film = Film.query.get_or_404(film_id)
 
     title = request.json['title']
     description = request.json['description']

@@ -18,9 +18,7 @@ def read_all_actors():
 
 @actors_router.get('/<actor_id>')
 def read_actor(actor_id):
-    actor = Actor.query.get(actor_id)
-    if actor is None:
-        return jsonify("Cannot find actor."), 404
+    actor = Actor.query.get_or_404(actor_id)
     return actor_schema.dump(actor)
 
 
@@ -42,9 +40,7 @@ def create_actor():
 
 @actors_router.delete('/<actor_id>')
 def delete_actor(actor_id):
-    actor = Actor.query.get(actor_id)
-    if actor is None:
-        return jsonify("Cannot find actor to delete."), 404
+    actor = Actor.query.get_or_404(actor_id)
 
     try:
         db.session.delete(actor)
@@ -58,9 +54,7 @@ def delete_actor(actor_id):
 
 @actors_router.put('/<actor_id>')
 def update_actor(actor_id):
-    actor = Actor.query.get(actor_id)
-    if actor is None:
-        return jsonify("Cannot find actor to edit."), 404
+    actor = Actor.query.get_or_404(actor_id)
 
     first_name = request.json['first_name']
     last_name = request.json['last_name']
