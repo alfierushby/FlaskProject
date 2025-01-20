@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, request
 from marshmallow import ValidationError
-from sqlalchemy.exc import IntegrityError
+from sqlalchemy.exc import DBAPIError
 
 from api.models import db
 from api.models.actor import Actor
@@ -88,8 +88,8 @@ def add_actor(film_id, actor_id):
     film.actors.append(actor)
     try:
         db.session.commit()
-    except IntegrityError as err:
-        return jsonify(err.args), 400
+    except DBAPIError:
+        return jsonify("You tried to add an actor that already exists."), 400
     return actor_schema.dump(actor)
 
 
