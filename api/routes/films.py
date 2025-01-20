@@ -1,6 +1,4 @@
-from flask import Blueprint, jsonify, request
-from marshmallow import ValidationError
-from sqlalchemy.exc import DBAPIError, IntegrityError
+from flask import Blueprint, abort, request
 
 from api.models import db
 from api.models.actor import Actor
@@ -121,7 +119,7 @@ def delete_actor(film_id, actor_id):
     try:
         film.actors.remove(actor)
     except ValueError:
-        return jsonify("Cannot remove the actor as it doesn't exist"), 400
+        abort(400,"Cannot remove the film as it doesn't exist")
 
     db.session.commit()
     return actor_schema.dump(actor)
