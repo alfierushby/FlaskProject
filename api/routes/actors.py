@@ -19,7 +19,10 @@ def read_all_actors():
     return actors_schema.dump(actors)
 
 @actors_router.post('/search')
-def search_films():
+def search_actors():
+    """
+    :return: The actors specified in the request args
+    """
     first_name = request.args.get('first_name','')
     last_name = request.args.get('last_name', '')
 

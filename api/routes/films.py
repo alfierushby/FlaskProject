@@ -30,6 +30,9 @@ def read_film(film_id):
 
 @films_router.post('/search')
 def search_films():
+    """
+    :return: The films specified in the request args
+    """
     title = request.args.get('title','')
     description = request.args.get('description', '')
 
