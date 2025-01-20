@@ -10,6 +10,9 @@ from api.schemas.actor import actor_schema, actors_schema
 # We can insert this into our flask app
 films_router = Blueprint('films', __name__, url_prefix='/films')
 
+def paginate(page, per_page):
+
+
 @films_router.get('/')
 def read_all_films():
     """
@@ -17,13 +20,29 @@ def read_all_films():
     """
     title = request.args.get('title','')
     description = request.args.get('description', '')
+    page = request.args.get('page', 1, type=int)
+    per_page = request.args.get('per_page', 10, type=int)
 
     films = Film.query.filter(or_(
         Film.title.contains(f"%{title}%")),
         Film.description.contains(f"%{description}")
-                              ).all()
+                              ).paginate(page=page, per_page=per_page)
 
-    return films_schema.dump(films)
+    data = {
+        "data": films_schema.dump(films),
+        "total": films.total,
+        "pages": films.pages,
+        "current_page": films.page,
+        "per_page": films.per_page
+    }
+
+    if page < films.pages:
+        data["next_page"] = f"{request.base_url}?page={page + 1}"
+
+    if page > 1:
+        data["prev_page"] = f"{request.base_url}?page={page - 1}"
+
+    return data
 
 @films_router.get('/<film_id>')
 def read_film(film_id):

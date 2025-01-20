@@ -30,6 +30,7 @@ def read_all_actors():
         "total": actors.total,
         "pages": actors.pages,
         "current_page": actors.page,
+        "per_page": actors.per_page
     }
 
     if page < actors.pages:
