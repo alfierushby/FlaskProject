@@ -15,18 +15,28 @@ films_router = Blueprint('films', __name__, url_prefix='/films')
 
 @films_router.get('/')
 def read_all_films():
+    """
+    :return: All the films in the database
+    """
     films = Film.query.all()
     return films_schema.dump(films)
 
 
 @films_router.get('/<film_id>')
 def read_film(film_id):
+    """
+    :param film_id: id of the film in the database
+    :return: The film specified by the ID, or a 404 if the film doesn't exist
+    """
     film = Film.query.get_or_404(film_id)
     return film_schema.dump(film)
 
 
 @films_router.post('/')
 def create_film():
+    """
+    :return: The film object if it is successfully added, otherwise an error message
+    """
     film_data = request.json
 
     try:
@@ -43,6 +53,10 @@ def create_film():
 
 @films_router.delete('/<film_id>')
 def delete_film(film_id):
+    """
+    :param film_id: The id of the film in the database
+    :return: The film object that has been deleted, or an error message
+    """
     film = Film.query.get_or_404(film_id)
 
     try:
@@ -57,6 +71,10 @@ def delete_film(film_id):
 
 @films_router.put('/<film_id>')
 def update_actor(film_id):
+    """
+    :param film_id: The id of the film in the database
+    :return: The newly updated film object, or an error message
+    """
     film = Film.query.get_or_404(film_id)
 
     title = request.json['title']
@@ -75,6 +93,10 @@ def update_actor(film_id):
 
 @films_router.get('/<film_id>/actors')
 def get_actors(film_id):
+    """
+    :param film_id:  The id of the film in the database
+    :return: A list of actors that star in the film, or an error message
+    """
     film = Film.query.get_or_404(film_id)
     actors = film.actors
 
@@ -83,6 +105,11 @@ def get_actors(film_id):
 
 @films_router.post('<film_id>/actors/<actor_id>')
 def add_actor(film_id, actor_id):
+    """
+    :param film_id: The id of the film in the database
+    :param actor_id: The id of the actor to star in the film
+    :return: The actor object that has been added to the film, or an error message
+    """
     film = Film.query.get_or_404(film_id)
     actor = Actor.query.get_or_404(actor_id)
     film.actors.append(actor)
@@ -95,6 +122,11 @@ def add_actor(film_id, actor_id):
 
 @films_router.delete('<film_id>/actors/<actor_id>')
 def delete_actor(film_id, actor_id):
+    """
+    :param film_id: The id of the film in the database
+    :param actor_id: The id of the actor to be removed from the film
+    :return: The actor removed from the film, or a error message
+    """
     film = Film.query.get_or_404(film_id)
     actor = Actor.query.get_or_404(actor_id)
     film.actors.remove(actor)
