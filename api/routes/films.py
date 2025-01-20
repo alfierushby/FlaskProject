@@ -12,13 +12,6 @@ from api.schemas.actor import actor_schema, actors_schema
 # We can insert this into our flask app
 films_router = Blueprint('films', __name__, url_prefix='/films')
 
-def try_commit(msg):
-    try:
-        db.session.commit()
-    except DBAPIError:
-        return jsonify(msg), 400
-
-
 @films_router.get('/')
 def read_all_films():
     """
@@ -45,10 +38,7 @@ def create_film():
     """
     film_data = request.json
 
-    try:
-        film_schema.load(film_data)
-    except ValidationError as err:
-        return jsonify(err.messages), 400
+    film_schema.load(film_data)
 
     film = Film(**film_data)
     db.session.add(film)
@@ -65,13 +55,13 @@ def delete_film(film_id):
     """
     film = Film.query.get_or_404(film_id)
     db.session.delete(film)
-    try_commit("Cannot delete actor from database")
+    db.session.commit()
 
     return film_schema.dump(film)
 
 
 @films_router.put('/<film_id>')
-def update_actor(film_id):
+def update_film(film_id):
     """
     :param film_id: The id of the film in the database
     :return: The newly updated film object, or an error message
@@ -88,7 +78,7 @@ def update_actor(film_id):
     film.release_year = release_year
     film.length = length
 
-    try_commit("Error with committing actor to database")
+    db.session.commit()
 
     return film_schema.dump(film)
 
@@ -115,10 +105,7 @@ def add_actor(film_id, actor_id):
     film = Film.query.get_or_404(film_id)
     actor = Actor.query.get_or_404(actor_id)
     film.actors.append(actor)
-    try:
-        db.session.commit()
-    except IntegrityError:
-        return jsonify("You tried to add a film that already exists"), 400
+    db.session.commit()
     return actor_schema.dump(actor)
 
 
@@ -136,5 +123,5 @@ def delete_actor(film_id, actor_id):
     except ValueError:
         return jsonify("Cannot remove the actor as it doesn't exist"), 400
 
-    try_commit("Error occurred when trying to commit to database")
+    db.session.commit()
     return actor_schema.dump(actor)

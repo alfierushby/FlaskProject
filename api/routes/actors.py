@@ -11,24 +11,6 @@ from api.schemas.film import film_schema, films_schema
 # Create a "Blueprint" or module
 actors_router = Blueprint('actors', __name__, url_prefix='/actors')
 
-
-@actors_router.errorhandler(ValidationError)
-def handle_validation_error(error):
-    return jsonify(error.messages), 400
-
-@actors_router.errorhandler(IntegrityError)
-def handle_integrity_error(error):
-    return jsonify("The integrity of the database cannot be met when trying this request. Usually this means you are "
-                   "trying to add a duplicate entry."), 400
-
-@actors_router.errorhandler(500)
-def handle_generic_error():
-    return jsonify("Internal Server Error"), 500
-
-@actors_router.errorhandler(400)
-def custom_error_400(msg):
-    return jsonify(msg), 400
-
 @actors_router.get('/')
 def read_all_actors():
     """
