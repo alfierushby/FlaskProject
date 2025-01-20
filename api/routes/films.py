@@ -1,5 +1,6 @@
 from flask import Blueprint, jsonify, request
 from marshmallow import ValidationError
+from sqlalchemy.exc import IntegrityError
 
 from api.models import db
 from api.models.actor import Actor
@@ -79,10 +80,23 @@ def get_actors(film_id):
 
     return actors_schema.dump(actors)
 
+
 @films_router.post('<film_id>/actors/<actor_id>')
 def add_actor(film_id, actor_id):
     film = Film.query.get_or_404(film_id)
     actor = Actor.query.get_or_404(actor_id)
     film.actors.append(actor)
+    try:
+        db.session.commit()
+    except IntegrityError as err:
+        return jsonify(err.args), 400
+    return actor_schema.dump(actor)
+
+
+@films_router.delete('<film_id>/actors/<actor_id>')
+def delete_actor(film_id, actor_id):
+    film = Film.query.get_or_404(film_id)
+    actor = Actor.query.get_or_404(actor_id)
+    film.actors.remove(actor)
     db.session.commit()
     return actor_schema.dump(actor)
