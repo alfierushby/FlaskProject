@@ -4,6 +4,7 @@ from sqlalchemy import or_
 from api.models import db
 from api.models.actor import Actor
 from api.models.film import Film
+from api.routes.films import paginate_data, paginate_args
 from api.schemas.actor import actor_schema, actors_schema
 from api.schemas.film import film_schema, films_schema
 
@@ -17,29 +18,14 @@ def read_all_actors():
     """
     first_name = request.args.get('first_name','')
     last_name = request.args.get('last_name', '')
-    page = request.args.get('page', 1, type=int)
-    per_page = request.args.get('per_page', 10, type=int)
+    page, per_page = paginate_args()
 
     actors = Actor.query.filter(or_(
         Actor.first_name.contains(f"%{first_name}%")),
         Actor.last_name.contains(f"%{last_name}")
                               ).paginate(page=page, per_page=per_page)
 
-    data = {
-        "data": actors_schema.dump(actors),
-        "total": actors.total,
-        "pages": actors.pages,
-        "current_page": actors.page,
-        "per_page": actors.per_page
-    }
-
-    if page < actors.pages:
-        data["next_page"] = f"{request.base_url}?page={page+1}"
-
-    if page > 1:
-        data["prev_page"] = f"{request.base_url}?page={page - 1}"
-
-    return data
+    return paginate_data(actors_schema,actors)
 
 @actors_router.get('/<actor_id>')
 def read_actor(actor_id):
