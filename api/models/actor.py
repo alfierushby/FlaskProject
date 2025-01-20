@@ -1,5 +1,4 @@
 from api.models import db
-from api.models import film
 
 
 # A model of our actor table

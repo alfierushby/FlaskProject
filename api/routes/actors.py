@@ -111,10 +111,7 @@ def delete_film(actor_id, film_id):
     """
     actor = Actor.query.get_or_404(actor_id)
     film = Film.query.get_or_404(film_id)
-    try:
-        actor.films.remove(film)
-    except ValueError:
-        abort(400,"Cannot remove the film as it doesn't exist")
+    actor.films.remove(film)
 
     db.session.commit()
     return film_schema.dump(film)

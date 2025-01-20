@@ -7,7 +7,6 @@ from api.routes.films import films_router
 
 routes = Blueprint('api',__name__, url_prefix='/api')
 
-
 @routes.errorhandler(ValidationError)
 def handle_validation_error(error):
     return error.messages, 400
@@ -24,6 +23,13 @@ def handle_generic_error(error):
 @routes.errorhandler(400)
 def custom_error_400(msg):
     return msg, 400
+
+@routes.errorhandler(ValueError)
+def handle_value_error(error):
+    if "list.remove(x)" in error.args[0]:
+        return "Cannot remove the entity because it doesn't exist", 400
+    else:
+        return "ValueError occurred", 400
 
 routes.register_blueprint(actors_router)
 routes.register_blueprint(films_router)
