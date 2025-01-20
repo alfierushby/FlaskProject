@@ -7,7 +7,6 @@ from api.schemas.actor import actor_schema, actors_schema
 from api.schemas.film import film_schema, films_schema
 
 # Create a "Blueprint" or module
-# We can insert this into our flask app
 actors_router = Blueprint('actors', __name__, url_prefix='/actors')
 
 
@@ -64,6 +63,7 @@ def update_actor(actor_id):
 
     db.session.commit()
     return actor_schema.dump(actor)
+
 
 @actors_router.get('/<actor_id>/films')
 def get_films(actor_id):

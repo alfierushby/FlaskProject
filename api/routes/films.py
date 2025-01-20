@@ -2,8 +2,10 @@ from flask import Blueprint, jsonify, request
 from marshmallow import ValidationError
 
 from api.models import db
+from api.models.actor import Actor
 from api.models.film import Film
 from api.schemas.film import film_schema, films_schema
+from api.schemas.actor import actor_schema, actors_schema
 
 # Create a "Blueprint" or module
 # We can insert this into our flask app
@@ -68,3 +70,12 @@ def update_actor(film_id):
 
     db.session.commit()
     return film_schema.dump(film)
+
+
+@films_router.get('/<film_id>/actors')
+def get_actors(film_id):
+    film = Film.query.get_or_404(film_id)
+    actors = film.actors
+
+    return actors_schema.dump(actors)
+
