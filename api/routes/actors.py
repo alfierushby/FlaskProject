@@ -4,6 +4,7 @@ from marshmallow import ValidationError
 from api.models import db
 from api.models.actor import Actor
 from api.schemas.actor import actor_schema, actors_schema
+from api.schemas.film import film_schema, films_schema
 
 # Create a "Blueprint" or module
 # We can insert this into our flask app
@@ -55,7 +56,6 @@ def delete_actor(actor_id):
 @actors_router.put('/<actor_id>')
 def update_actor(actor_id):
     actor = Actor.query.get_or_404(actor_id)
-
     first_name = request.json['first_name']
     last_name = request.json['last_name']
 
@@ -64,3 +64,10 @@ def update_actor(actor_id):
 
     db.session.commit()
     return actor_schema.dump(actor)
+
+@actors_router.get('/<actor_id>/films')
+def get_films(actor_id):
+    actor = Actor.query.get_or_404(actor_id)
+    films = actor.films
+
+    return films_schema.dump(films)
