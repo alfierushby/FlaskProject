@@ -1,4 +1,5 @@
 from flask import Blueprint, request
+from sqlalchemy import or_
 
 from api.models import db
 from api.models.actor import Actor
@@ -15,6 +16,18 @@ def read_all_actors():
     :return: All the actors in the database
     """
     actors = Actor.query.all()
+    return actors_schema.dump(actors)
+
+@actors_router.post('/search')
+def search_films():
+    first_name = request.args.get('first_name','')
+    last_name = request.args.get('last_name', '')
+
+    actors = Actor.query.filter(or_(
+        Actor.first_name.like(f"%{first_name}%")),
+        Actor.last_name.like(f"%{last_name}")
+                              ).all()
+
     return actors_schema.dump(actors)
 
 
