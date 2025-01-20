@@ -42,7 +42,7 @@ def create_film():
     db.session.add(film)
     db.session.commit()
 
-    return film_schema.dump(film)
+    return film_schema.dump(film),201
 
 
 @films_router.delete('/<film_id>')
@@ -55,7 +55,7 @@ def delete_film(film_id):
     db.session.delete(film)
     db.session.commit()
 
-    return film_schema.dump(film)
+    return film_schema.dump(film),200
 
 
 @films_router.put('/<film_id>')
@@ -78,7 +78,7 @@ def update_film(film_id):
 
     db.session.commit()
 
-    return film_schema.dump(film)
+    return film_schema.dump(film),200
 
 
 @films_router.get('/<film_id>/actors')
@@ -93,7 +93,7 @@ def get_actors(film_id):
     return actors_schema.dump(actors)
 
 
-@films_router.post('<film_id>/actors/<actor_id>')
+@films_router.post('/<film_id>/actors/<actor_id>')
 def add_actor(film_id, actor_id):
     """
     :param film_id: The id of the film in the database
@@ -104,10 +104,10 @@ def add_actor(film_id, actor_id):
     actor = Actor.query.get_or_404(actor_id)
     film.actors.append(actor)
     db.session.commit()
-    return actor_schema.dump(actor)
+    return actor_schema.dump(actor),201
 
 
-@films_router.delete('<film_id>/actors/<actor_id>')
+@films_router.delete('/<film_id>/actors/<actor_id>')
 def delete_actor(film_id, actor_id):
     """
     :param film_id: The id of the film in the database
@@ -119,4 +119,4 @@ def delete_actor(film_id, actor_id):
     film.actors.remove(actor)
 
     db.session.commit()
-    return actor_schema.dump(actor)
+    return actor_schema.dump(actor),200
