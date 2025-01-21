@@ -5,7 +5,7 @@ from api.models.actor import Actor
 from api.models.category import Category
 from api.models.film import Film
 from api.routes.common_functions import paginate_args, paginate_data, filter_data
-from api.schemas.category import categories_schema
+from api.schemas.category import categories_schema, category_schema
 from api.schemas.film import film_schema, films_schema
 from api.schemas.actor import actor_schema, actors_schema
 
@@ -157,5 +157,16 @@ def get_categories(film_id):
     categories = (filter_data(film.categories,Category,[('name',name)]).paginate(page=page, per_page=per_page))
 
     return paginate_data(categories_schema, categories)
+
+@films_router.get('/<film_id>/categories/<category_id>')
+def get_category(film_id,category_id):
+    """
+    :param film_id:  The id of the film in the database
+    :param category_id: id of the category in the database
+    :return: The category specified by the ID, or a 404 if the actor doesn't exist
+    """
+    film = Film.query.get_or_404(film_id)
+    category = film.categories.filter_by(category_id=category_id).first_or_404()
+    return category_schema.dump(category)
 
 
