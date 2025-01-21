@@ -95,7 +95,20 @@ def get_films(actor_id):
 
     films = (filter_data(actor.films,Film,[('title',title),('description',description)])
              .paginate(page=page, per_page=per_page))
+
     return paginate_data(films_schema, films)
+
+
+@actors_router.get('/<actor_id>/films/<film_id>')
+def get_film(actor_id, film_id):
+    """
+    :param actor_id: The id of the actor in the database
+    :param film_id: The id of the film the actor will star in
+    :return: The film object that has been added to the actor's filmography, or an error message
+    """
+    actor = Actor.query.get_or_404(actor_id)
+    film = actor.films.filter_by(film_id=film_id).first_or_404()
+    return film_schema.dump(film),201
 
 
 @actors_router.patch('/<actor_id>/films/<film_id>')

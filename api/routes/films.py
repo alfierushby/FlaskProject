@@ -22,6 +22,7 @@ def read_all_films():
 
     films = (filter_data(Film.query,Film,[('title',title),('description',description)])
              .paginate(page=page, per_page=per_page))
+
     return paginate_data(films_schema, films)
 
 @films_router.get('/<film_id>')
@@ -100,6 +101,17 @@ def get_actors(film_id):
               .paginate(page=page, per_page=per_page))
 
     return paginate_data(actors_schema,actors)
+
+@films_router.get('/<film_id>/actors/<actor_id>')
+def get_actor(film_id, actor_id):
+    """
+    :param film_id: The id of the film in the database
+    :param actor_id: The id of the actor to star in the film
+    :return: The actor object that stars in the film, or an error message
+    """
+    film = Film.query.get_or_404(film_id)
+    actor = film.actors.filter_by(actor_id=actor_id).first_or_404()
+    return actor_schema.dump(actor),201
 
 
 @films_router.patch('/<film_id>/actors/<actor_id>')
