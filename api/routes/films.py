@@ -169,4 +169,30 @@ def get_category(film_id,category_id):
     category = film.categories.filter_by(category_id=category_id).first_or_404()
     return category_schema.dump(category)
 
+@films_router.patch('/<film_id>/categories/<category_id>')
+def add_category(film_id, category_id):
+    """
+    :param film_id: The id of the film in the database
+    :param category_id: The id of the category for the film
+    :return: The category object that has been added to the film, or an error message
+    """
+    film = Film.query.get_or_404(film_id)
+    category = Category.query.get_or_404(category_id)
+    film.categories.append(category)
+    db.session.commit()
+    return category_schema.dump(category)
+
+@films_router.delete('/<film_id>/categories/<category_id>')
+def remove_category(film_id, category_id):
+    """
+    :param film_id: The id of the film in the database
+    :param category_id: The id of the category for the film
+    :return: The category object that has been removed from the film, or an error message
+    """
+    film = Film.query.get_or_404(film_id)
+    category = Category.query.get_or_404(category_id)
+    film.categories.remove(category)
+    db.session.commit()
+    return category_schema.dump(category)
+
 

@@ -2,6 +2,8 @@ from flask import Blueprint
 
 from marshmallow import ValidationError
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy.orm.exc import StaleDataError
+
 from api.routes.actors import actors_router
 from api.routes.categories import categories_router
 from api.routes.films import films_router
@@ -44,6 +46,15 @@ def handle_generic_error(error):
 @routes.errorhandler(400)
 def custom_error_400(msg):
     return msg, 400
+
+@routes.errorhandler(StaleDataError)
+def handle_stale_data_error(error):
+    return {
+        "error": "Stale Data Error",
+        "message": "Data does not exist",
+        "error_type": "internal_error"
+    }, 400
+
 
 @routes.errorhandler(ValueError)
 def handle_value_error(error):
