@@ -103,19 +103,6 @@ def get_actors(film_id):
 
     return paginate_data(actors_schema,actors)
 
-@films_router.get('/<film_id>/categories')
-def get_categories(film_id):
-    """
-    :param film_id:  The id of the film in the database
-    :return: A list of actors that star in the film paginated, or an error message
-    """
-    film = Film.query.get_or_404(film_id)
-    name = request.args.get('name','')
-    page, per_page = paginate_args()
-
-    categories = (filter_data(film.categories,Category,[('name',name)]).paginate(page=page, per_page=per_page))
-
-    return paginate_data(categories_schema, categories)
 
 @films_router.get('/<film_id>/actors/<actor_id>')
 def get_actor(film_id, actor_id):
@@ -156,3 +143,17 @@ def delete_actor(film_id, actor_id):
 
     db.session.commit()
     return actor_schema.dump(actor),200
+
+@films_router.get('/<film_id>/categories')
+def get_categories(film_id):
+    """
+    :param film_id:  The id of the film in the database
+    :return: A list of categories for the film, or an error message
+    """
+    film = Film.query.get_or_404(film_id)
+    name = request.args.get('name','')
+    page, per_page = paginate_args()
+
+    categories = (filter_data(film.categories,Category,[('name',name)]).paginate(page=page, per_page=per_page))
+
+    return paginate_data(categories_schema, categories)
