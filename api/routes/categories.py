@@ -45,6 +45,21 @@ def delete_category(category_id):
 
     return category_schema.dump(category),200
 
+@categories_router.post('/')
+def create_category():
+    """
+    :return: The category object if it is successfully added, otherwise an error message
+    """
+    category_data = request.json
+
+    category_schema.load(category_data)
+
+    category = Category(**category_data)
+    db.session.add(category)
+    db.session.commit()
+
+    return category_schema.dump(category),201
+
 
 
 @categories_router.get('/<category_id>/films')
