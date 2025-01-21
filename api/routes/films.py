@@ -1,5 +1,4 @@
 from flask import Blueprint, request
-from sqlalchemy import or_
 from api.models import db
 from api.models.actor import Actor
 from api.models.category import Category

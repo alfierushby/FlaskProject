@@ -1,9 +1,6 @@
 from flask import request
 from sqlalchemy import and_
 
-from api.models.actor import Actor
-
-
 def paginate_args():
     return request.args.get('page', 1, type=int), request.args.get('per_page', 10, type=int)
 
