@@ -77,3 +77,16 @@ def read_films(category_id):
              .paginate(page=page, per_page=per_page))
 
     return paginate_data(films_schema, films)
+
+@categories_router.patch('/<category_id>/films/<film_id>')
+def add_film(category_id, film_id):
+    """
+    :param category_id: The id of the category in the database
+    :param film_id: The id of the film the actor will star in
+    :return: The film object that has been added to the category, or an error message
+    """
+    category = Category.query.get_or_404(category_id)
+    film = Film.query.get_or_404(film_id)
+    category.films.append(film)
+    db.session.commit()
+    return film_schema.dump(film),201
