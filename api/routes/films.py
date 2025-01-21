@@ -157,3 +157,5 @@ def get_categories(film_id):
     categories = (filter_data(film.categories,Category,[('name',name)]).paginate(page=page, per_page=per_page))
 
     return paginate_data(categories_schema, categories)
+
+
