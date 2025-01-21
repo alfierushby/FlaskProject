@@ -2,8 +2,10 @@ from flask import Blueprint, request
 from sqlalchemy import or_
 from api.models import db
 from api.models.actor import Actor
+from api.models.category import Category
 from api.models.film import Film
 from api.routes.common_functions import paginate_args, paginate_data, filter_data
+from api.schemas.category import categories_schema
 from api.schemas.film import film_schema, films_schema
 from api.schemas.actor import actor_schema, actors_schema
 
@@ -100,6 +102,20 @@ def get_actors(film_id):
               .paginate(page=page, per_page=per_page))
 
     return paginate_data(actors_schema,actors)
+
+@films_router.get('/<film_id>/categories')
+def get_categories(film_id):
+    """
+    :param film_id:  The id of the film in the database
+    :return: A list of actors that star in the film paginated, or an error message
+    """
+    film = Film.query.get_or_404(film_id)
+    name = request.args.get('name','')
+    page, per_page = paginate_args()
+
+    categories = (filter_data(film.categories,Category,[('name',name)]).paginate(page=page, per_page=per_page))
+
+    return paginate_data(categories_schema, categories)
 
 @films_router.get('/<film_id>/actors/<actor_id>')
 def get_actor(film_id, actor_id):
