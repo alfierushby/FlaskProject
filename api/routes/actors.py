@@ -104,7 +104,7 @@ def get_film(actor_id, film_id):
     """
     :param actor_id: The id of the actor in the database
     :param film_id: The id of the film the actor will star in
-    :return: The film object that has been added to the actor's filmography, or an error message
+    :return: The film object that is in the actor's filmography, or an error message
     """
     actor = Actor.query.get_or_404(actor_id)
     film = actor.films.filter_by(film_id=film_id).first_or_404()
