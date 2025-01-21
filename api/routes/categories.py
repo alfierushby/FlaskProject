@@ -33,6 +33,19 @@ def read_category(category_id):
     category = Category.query.get_or_404(category_id)
     return category_schema.dump(category)
 
+@categories_router.delete('/<category_id>')
+def delete_category(category_id):
+    """
+    :param category_id: The id of the category in the database
+    :return: The category object that has been deleted, or an error message
+    """
+    category = Category.query.get_or_404(category_id)
+    db.session.delete(category)
+    db.session.commit()
+
+    return category_schema.dump(category),200
+
+
 
 @categories_router.get('/<category_id>/films')
 def read_films(category_id):
