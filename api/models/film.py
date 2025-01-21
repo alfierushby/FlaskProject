@@ -1,6 +1,7 @@
 from api.models import db
+from api.models import category
 
-# A model of our actor table
+# A model of our film table
 class Film(db.Model):
     film_id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(128), nullable=False)
@@ -9,3 +10,4 @@ class Film(db.Model):
     length = db.Column(db.Integer, nullable=False)
 
     actors = db.relationship('Actor', secondary='film_actor', back_populates='films',lazy='dynamic')
+    category = db.relationship('Category', secondary='film_category', back_populates='films', lazy='dynamic')

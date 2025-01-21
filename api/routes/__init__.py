@@ -3,6 +3,7 @@ from flask import Blueprint
 from marshmallow import ValidationError
 from sqlalchemy.exc import IntegrityError
 from api.routes.actors import actors_router
+from api.routes.categories import categories_router
 from api.routes.films import films_router
 
 
@@ -61,5 +62,6 @@ def handle_value_error(error):
 
 routes.register_blueprint(actors_router)
 routes.register_blueprint(films_router)
+routes.register_blueprint(categories_router)
 
 

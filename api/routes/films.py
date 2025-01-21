@@ -40,7 +40,6 @@ def create_film():
     :return: The film object if it is successfully added, otherwise an error message
     """
     film_data = request.json
-
     film_schema.load(film_data)
 
     film = Film(**film_data)
