@@ -55,6 +55,13 @@ def handle_stale_data_error(error):
         "error_type": "internal_error"
     }, 400
 
+@routes.errorhandler(KeyError)
+def handle_key_error(error):
+    return {
+        "error": "Key Error",
+        "message": "Required key(s) do not exist in request",
+        "error_type": "internal_error"
+    }, 400
 
 @routes.errorhandler(ValueError)
 def handle_value_error(error):
