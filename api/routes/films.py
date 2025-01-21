@@ -3,7 +3,7 @@ from sqlalchemy import or_
 from api.models import db
 from api.models.actor import Actor
 from api.models.film import Film
-from api.routes.common_functions import paginate_args, paginate_data
+from api.routes.common_functions import paginate_args, paginate_data, filter_data
 from api.schemas.film import film_schema, films_schema
 from api.schemas.actor import actor_schema, actors_schema
 
@@ -20,10 +20,8 @@ def read_all_films():
     description = request.args.get('description', '')
     page, per_page = paginate_args()
 
-    films = Film.query.filter(or_(
-        Film.title.contains(f"%{title}%")),
-        Film.description.contains(f"%{description}")
-                              ).paginate(page=page, per_page=per_page)
+    films = (filter_data(Film.query,Film,[('title',title),('description',description)])
+             .paginate(page=page, per_page=per_page))
     return paginate_data(films_schema, films)
 
 @films_router.get('/<film_id>')
@@ -98,10 +96,8 @@ def get_actors(film_id):
     last_name = request.args.get('last_name', '')
     page, per_page = paginate_args()
 
-    actors = film.actors.filter(or_(
-        Actor.first_name.contains(f"%{first_name}%")),
-        Actor.last_name.contains(f"%{last_name}")
-                              ).paginate(page=page, per_page=per_page)
+    actors = (filter_data(film.actors,Actor,[('first_name',first_name),('last_name',last_name)])
+              .paginate(page=page, per_page=per_page))
 
     return paginate_data(actors_schema,actors)
 
